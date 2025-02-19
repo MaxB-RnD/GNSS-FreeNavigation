@@ -40,5 +40,6 @@
 /src/devel/
 /src/srv/
 
-# Ignore VSCode settings
+# Ignore VSCode settings & Other Files
 /.vscode/
+/.catkin_workspace
