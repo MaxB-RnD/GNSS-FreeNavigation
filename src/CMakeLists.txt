@@ -35,10 +35,13 @@ find_package(catkin REQUIRED COMPONENTS
     # msg generation
     message_generation
 )
+# Specify the OpenCV directory and libraries manually
+set(OpenCV_DIR "/usr/local/share/opencv4")
+find_package(OpenCV REQUIRED)
 
+# Continue with the rest of the CMake configurations
 find_package(OpenMP REQUIRED)
 find_package(PCL REQUIRED)
-find_package(OpenCV REQUIRED)
 find_package(Ceres REQUIRED)
 find_package(GTSAM REQUIRED QUIET)
 find_package(Boost REQUIRED COMPONENTS filesystem program_options system timer)

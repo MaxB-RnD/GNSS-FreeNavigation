@@ -16,9 +16,9 @@ GNSS-FreeNav is a deep learning-based navigation system designed for **GNSS-deni
 To get the program up and running, you will need to install the following dependencies:
 
 ### 1. [ROS](http://wiki.ros.org/ROS/Installation) (Tested with Kinetic and Melodic)
-   Install the correct version of ROS on your system.
+   Install the correct version of ROS on your system, by following the link. 
    </br></br>
-
+   
 
 ### 2. [Ceres](http://ceres-solver.org/installation.html) (C++ library for modeling and solving large, complicated optimization problems)
    Install Ceres by following these steps:

@@ -13,7 +13,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <nav_msgs/Odometry.h>
 
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 
 #include <pcl/point_cloud.h>
@@ -26,14 +26,14 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/filters/filter.h>
 #include <pcl/filters/voxel_grid.h>
-#include <pcl/filters/crop_box.h> 
+#include <pcl/filters/crop_box.h>
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
- 
+
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -56,8 +56,6 @@
 using namespace std;
 
 typedef pcl::PointXYZI PointType;
-
-
 
 extern int ROW;
 extern int COL;
@@ -94,7 +92,7 @@ extern double L_C_RY;
 extern double L_C_RZ;
 #else
 extern tf::Transform Transform_imu_lidar;
-#endif 
+#endif
 
 void readParameters(ros::NodeHandle &n);
 

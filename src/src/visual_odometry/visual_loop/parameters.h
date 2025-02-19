@@ -20,7 +20,7 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 
 #include <pcl/point_cloud.h>
@@ -33,14 +33,14 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/filters/filter.h>
 #include <pcl/filters/voxel_grid.h>
-#include <pcl/filters/crop_box.h> 
+#include <pcl/filters/crop_box.h>
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
- 
+
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -87,15 +87,9 @@ extern ros::Publisher pub_match_img;
 extern ros::Publisher pub_match_msg;
 extern ros::Publisher pub_key_pose;
 
-
-
-
-
-
 class BriefExtractor
 {
 public:
-
     DVision::BRIEF m_brief;
 
     virtual void operator()(const cv::Mat &im, vector<cv::KeyPoint> &keys, vector<DVision::BRIEF::bitset> &descriptors) const
@@ -103,7 +97,7 @@ public:
         m_brief.compute(im, keys, descriptors);
     }
 
-    BriefExtractor(){};
+    BriefExtractor() {};
 
     BriefExtractor(const std::string &pattern_file)
     {
@@ -114,7 +108,8 @@ public:
 
         // loads the pattern
         cv::FileStorage fs(pattern_file.c_str(), cv::FileStorage::READ);
-        if(!fs.isOpened()) throw string("Could not open file ") + pattern_file;
+        if (!fs.isOpened())
+            throw string("Could not open file ") + pattern_file;
 
         vector<int> x1, y1, x2, y2;
         fs["x1"] >> x1;
