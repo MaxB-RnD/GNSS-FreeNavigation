@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+# Ignore root-level build and devel directories
+/build/
+/devel/
+
+# Ignore specific folders inside src
+/src/build/
+/src/devel/
+/src/srv/
+
+# Ignore VSCode settings
+/.vscode/
