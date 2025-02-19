@@ -40,13 +40,13 @@ Follow these steps to install GTSAM:
    sudo rm -rf /usr/local/share/cmake/GTSAM
    ```
 
-   ### 2. Install Eigen
+   #### 2. Install Eigen
    Make sure the system uses the correct version of Eigen by installing it with:
    ```bash
    sudo apt install libeigen3-dev
    ```
 
-   ### 3. Install GTSAM
+   #### 3. Install GTSAM
    Clone the GTSAM repository and build it:
    ```bash
    cd ~/Documents/GNSS-FreeNav  # Adjust path if needed
@@ -58,22 +58,28 @@ Follow these steps to install GTSAM:
    sudo make install
    ```
 
-   ### 4. Verify the installation
+   #### 4. Verify the installation
    After confirming that GTSAM is working, you can remove the temporary folder:
    ```bash
    rm -rf ~/Documents/GNSS-FreeNav/gtsam
    ```
 
+### 4. Library Troubleshooting  
+If you encounter issues with missing libraries or include path errors, update your `c_cpp_properties.json` file to include the **ROS**, **Eigen**, and **OpenCV** libraries.  
+
+*Be sure to include the correct versions installed on your system—Eigen3, for example.*  
+
 
 ## Usage  
-(TODO: Provide details on how to run the model tests, input data format, and expected outputs)  
    Now you need to set up the environment in the root folder of the repository. Run the following commands:
    ```bash
    source /opt/ros/noetic/setup.bash
+   source ~/"Path to Repository"/devel/setup.bash
    catkin_make clean
    catkin_make
    source devel/setup.bash
    ```
+(TODO: Provide details on how to run the model tests, input data format, and expected outputs)  
 
 
 
