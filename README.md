@@ -9,6 +9,7 @@ GNSS-FreeNav is a deep learning-based navigation system designed for **GNSS-deni
 - **Robust to GNSS Outages** – Provides navigation solutions when GPS signals are unavailable.  
 - **Optimised for Embedded Systems** – Designed for deployment on platforms like the Jetson Nano.  
 - **Incorporates Open-Source Models** – Builds upon existing research, including LVI-SAM.  
+</br>
 
 
 ## Installation  
@@ -16,6 +17,8 @@ To get the program up and running, you will need to install the following depend
 
 ### 1. [ROS](http://wiki.ros.org/ROS/Installation) (Tested with Kinetic and Melodic)
    Install the correct version of ROS on your system.
+   </br>
+
 
 ### 2. [Ceres](http://ceres-solver.org/installation.html) (C++ library for modeling and solving large, complicated optimization problems)
    Install Ceres by following these steps:
@@ -29,6 +32,8 @@ To get the program up and running, you will need to install the following depend
    cmake ..
    sudo make install -j4 
    ```
+   </br>
+
 
 ### 3. [GTSAM](https://gtsam.org/get_started/) (Georgia Tech Smoothing and Mapping library)
 Follow these steps to install GTSAM:
@@ -63,11 +68,14 @@ Follow these steps to install GTSAM:
    ```bash
    rm -rf ~/Documents/GNSS-FreeNav/gtsam
    ```
+   </br>
+
 
 ### 4. Library Troubleshooting  
 If you encounter issues with missing libraries or include path errors, update your `c_cpp_properties.json` file to include the **ROS**, **Eigen**, and **OpenCV** libraries.  
 
 *Be sure to include the correct versions installed on your system—Eigen3, for example.*  
+</br>
 
 
 ## Usage  
