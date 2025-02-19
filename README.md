@@ -17,7 +17,7 @@ To get the program up and running, you will need to install the following depend
 
 ### 1. [ROS](http://wiki.ros.org/ROS/Installation) (Tested with Kinetic and Melodic)
    Install the correct version of ROS on your system.
-   </br>
+   </br></br>
 
 
 ### 2. [Ceres](http://ceres-solver.org/installation.html) (C++ library for modeling and solving large, complicated optimization problems)
@@ -75,7 +75,7 @@ Follow these steps to install GTSAM:
 If you encounter issues with missing libraries or include path errors, update your `c_cpp_properties.json` file to include the **ROS**, **Eigen**, and **OpenCV** libraries.  
 
 *Be sure to include the correct versions installed on your system—Eigen3, for example.*  
-</br>
+</br></br>
 
 
 ## Usage  
