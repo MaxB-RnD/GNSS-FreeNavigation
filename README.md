@@ -6,7 +6,7 @@ To get the program up and running, you will need to install the following depend
    </br></br>
    
 
-### 2. [Ceres](http://ceres-solver.org/installation.html) (C++ library for modeling and solving large, complicated optimization problems)
+### 2. [Ceres](http://ceres-solver.org/installation.html) (C++ library for modeling and solving large, complicated optimisation problems)
    Install Ceres by following these steps:
    ```bash
    sudo apt-get install -y libgoogle-glog-dev
