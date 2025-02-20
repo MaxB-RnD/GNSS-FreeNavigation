@@ -34,6 +34,7 @@
 # Ignore root-level build and devel directories
 /build/
 /devel/
+/bags/
 
 # Ignore specific folders inside src
 /src/build/

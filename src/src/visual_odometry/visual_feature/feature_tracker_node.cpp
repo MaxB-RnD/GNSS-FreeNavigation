@@ -2,7 +2,6 @@
 
 #define SHOW_UNDISTORTION 0
 
-
 // mtx lock for two threads
 std::mutex mtx_lidar;
 
@@ -29,13 +28,11 @@ bool first_image_flag = true;
 double last_image_time = 0;
 bool init_pub = 0;
 
-
-
 void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
 {
     double cur_img_time = img_msg->header.stamp.toSec();
 
-    if(first_image_flag)
+    if (first_image_flag)
     {
         first_image_flag = false;
         first_image_time = cur_img_time;
@@ -46,7 +43,7 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
     if (cur_img_time - last_image_time > 1.0 || cur_img_time < last_image_time)
     {
         ROS_WARN("image discontinue! reset the feature tracker!");
-        first_image_flag = true; 
+        first_image_flag = true;
         last_image_time = 0;
         pub_count = 1;
         std_msgs::Bool restart_flag;
@@ -105,9 +102,9 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
                 trackerData[i].cur_img = ptr->image.rowRange(ROW * i, ROW * (i + 1));
         }
 
-        #if SHOW_UNDISTORTION
-            trackerData[i].showUndistortion("undistrotion_" + std::to_string(i));
-        #endif
+#if SHOW_UNDISTORTION
+        trackerData[i].showUndistortion("undistrotion_" + std::to_string(i));
+#endif
     }
 
     for (unsigned int i = 0;; i++)
@@ -120,8 +117,8 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
             break;
     }
 
-   if (PUB_THIS_FRAME)
-   {
+    if (PUB_THIS_FRAME)
+    {
         pub_count++;
         sensor_msgs::PointCloudPtr feature_points(new sensor_msgs::PointCloud);
         sensor_msgs::ChannelFloat32 id_of_point;
@@ -175,7 +172,7 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
 
         sensor_msgs::ChannelFloat32 depth_of_points = depthRegister->get_depth(img_msg->header.stamp, show_img, depth_cloud_temp, trackerData[0].m_camera, feature_points->points);
         feature_points->channels.push_back(depth_of_points);
-        
+
         // skip the first image; since no optical speed on frist image
         if (!init_pub)
         {
@@ -188,7 +185,7 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
         if (pub_match.getNumSubscribers() != 0)
         {
             ptr = cv_bridge::cvtColor(ptr, sensor_msgs::image_encodings::RGB8);
-            //cv::Mat stereo_img(ROW * NUM_OF_CAM, COL, CV_8UC3);
+            // cv::Mat stereo_img(ROW * NUM_OF_CAM, COL, CV_8UC3);
             cv::Mat stereo_img = ptr->image;
 
             for (int i = 0; i < NUM_OF_CAM; i++)
@@ -203,9 +200,11 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
                         // track count
                         double len = std::min(1.0, 1.0 * trackerData[i].track_cnt[j] / WINDOW_SIZE);
                         cv::circle(tmp_img, trackerData[i].cur_pts[j], 4, cv::Scalar(255 * (1 - len), 255 * len, 0), 4);
-                    } else {
-                        // depth 
-                        if(j < depth_of_points.values.size())
+                    }
+                    else
+                    {
+                        // depth
+                        if (j < depth_of_points.values.size())
                         {
                             if (depth_of_points.values[j] > 0)
                                 cv::circle(tmp_img, trackerData[i].cur_pts[j], 4, cv::Scalar(0, 255, 0), 4);
@@ -221,34 +220,35 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
     }
 }
 
-
-void lidar_callback(const sensor_msgs::PointCloud2ConstPtr& laser_msg)
+void lidar_callback(const sensor_msgs::PointCloud2ConstPtr &laser_msg)
 {
     static int lidar_count = -1;
-    if (++lidar_count % (LIDAR_SKIP+1) != 0)
+    if (++lidar_count % (LIDAR_SKIP + 1) != 0)
         return;
 
     // 0. listen to transform
     static tf::TransformListener listener;
 #if IF_OFFICIAL
-    static tf::StampedTransform transform;   //; T_vinsworld_camera_FLU
+    static tf::StampedTransform transform; //; T_vinsworld_camera_FLU
 #else
-    static tf::StampedTransform transform_world_cFLU;   //; T_vinsworld_camera_FLU
-    static tf::StampedTransform transform_cFLU_imu;    //; T_cameraFLU_imu
+    static tf::StampedTransform transform_world_cFLU; //; T_vinsworld_camera_FLU
+    static tf::StampedTransform transform_cFLU_imu;   //; T_cameraFLU_imu
 #endif
-    try{
-    #if IF_OFFICIAL
+    try
+    {
+#if IF_OFFICIAL
         listener.waitForTransform("vins_world", "vins_body_ros", laser_msg->header.stamp, ros::Duration(0.01));
         listener.lookupTransform("vins_world", "vins_body_ros", laser_msg->header.stamp, transform);
-    #else   
+#else
         //? mod: 监听T_vinsworld_cameraFLU 和 T_cameraFLU_imu
         listener.waitForTransform("vins_world", "vins_cameraFLU", laser_msg->header.stamp, ros::Duration(0.01));
         listener.lookupTransform("vins_world", "vins_cameraFLU", laser_msg->header.stamp, transform_world_cFLU);
         listener.waitForTransform("vins_cameraFLU", "vins_body_imuhz", laser_msg->header.stamp, ros::Duration(0.01));
         listener.lookupTransform("vins_cameraFLU", "vins_body_imuhz", laser_msg->header.stamp, transform_cFLU_imu);
-    #endif
-    } 
-    catch (tf::TransformException ex){
+#endif
+    }
+    catch (const tf::TransformException &ex)
+    {
         // ROS_ERROR("lidar no tf");
         return;
     }
@@ -330,7 +330,9 @@ void lidar_callback(const sensor_msgs::PointCloud2ConstPtr& laser_msg)
         {
             cloudQueue.pop_front();
             timeQueue.pop_front();
-        } else {
+        }
+        else
+        {
             break;
         }
     }
@@ -363,12 +365,12 @@ int main(int argc, char **argv)
         trackerData[i].readIntrinsicParameter(CAM_NAMES[i]);
 
     // load fisheye mask to remove features on the boundry
-    if(FISHEYE)
+    if (FISHEYE)
     {
         for (int i = 0; i < NUM_OF_CAM; i++)
         {
             trackerData[i].fisheye_mask = cv::imread(FISHEYE_MASK, 0);
-            if(!trackerData[i].fisheye_mask.data)
+            if (!trackerData[i].fisheye_mask.data)
             {
                 ROS_ERROR("load fisheye mask fail");
                 ROS_BREAK();
@@ -380,17 +382,17 @@ int main(int argc, char **argv)
 
     // initialize depthRegister (after readParameters())
     depthRegister = new DepthRegister(n);
-    
+
     // subscriber to image and lidar
-    ros::Subscriber sub_img   = n.subscribe(IMAGE_TOPIC,       5,    img_callback);
-    ros::Subscriber sub_lidar = n.subscribe(POINT_CLOUD_TOPIC, 5,    lidar_callback);
+    ros::Subscriber sub_img = n.subscribe(IMAGE_TOPIC, 5, img_callback);
+    ros::Subscriber sub_lidar = n.subscribe(POINT_CLOUD_TOPIC, 5, lidar_callback);
     if (!USE_LIDAR)
         sub_lidar.shutdown();
 
     // messages to vins estimator
-    pub_feature = n.advertise<sensor_msgs::PointCloud>(PROJECT_NAME + "/vins/feature/feature",     5);
-    pub_match   = n.advertise<sensor_msgs::Image>     (PROJECT_NAME + "/vins/feature/feature_img", 5);
-    pub_restart = n.advertise<std_msgs::Bool>         (PROJECT_NAME + "/vins/feature/restart",     5);
+    pub_feature = n.advertise<sensor_msgs::PointCloud>(PROJECT_NAME + "/vins/feature/feature", 5);
+    pub_match = n.advertise<sensor_msgs::Image>(PROJECT_NAME + "/vins/feature/feature_img", 5);
+    pub_restart = n.advertise<std_msgs::Bool>(PROJECT_NAME + "/vins/feature/restart", 5);
 
     // two ROS spinners for parallel processing (image and lidar)
     ros::MultiThreadedSpinner spinner(2);

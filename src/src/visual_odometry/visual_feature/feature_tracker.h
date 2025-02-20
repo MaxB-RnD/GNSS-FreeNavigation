@@ -109,16 +109,16 @@ public:
         try
         {
 
-        #if IF_OFFICIAL
+#if IF_OFFICIAL
             listener.waitForTransform("vins_world", "vins_body_ros", stamp_cur, ros::Duration(0.01));
             listener.lookupTransform("vins_world", "vins_body_ros", stamp_cur, transform);
-        #else
+#else
             //? mod: 直接监听vins_camFLU坐标系在世界坐标系下的表示，这样就把VIO的动态外参包括进去了
             listener.waitForTransform("vins_world", "vins_cameraFLU", stamp_cur, ros::Duration(0.01));
             listener.lookupTransform("vins_world", "vins_cameraFLU", stamp_cur, transform);
-        #endif
+#endif
         }
-        catch (tf::TransformException ex)
+        catch (const tf::TransformException &ex)
         {
             // ROS_ERROR("image no tf");
             return depth_of_point;
