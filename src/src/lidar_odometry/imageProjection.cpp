@@ -1,7 +1,8 @@
 #include "lvi_sam/cloud_info.h"
 #include "utility.h"
 
-struct VelodynePointXYZIRT {
+struct VelodynePointXYZIRT
+{
   PCL_ADD_POINT4D
   PCL_ADD_INTENSITY;
   uint16_t ring;
@@ -11,10 +12,11 @@ struct VelodynePointXYZIRT {
 POINT_CLOUD_REGISTER_POINT_STRUCT(
     VelodynePointXYZIRT,
     (float, x, x)(float, y, y)(float, z, z)(float, intensity,
-                                            intensity)(uint16_t, ring,
+                                            intensity)(std::uint16_t, ring,
                                                        ring)(float, time, time))
 
-struct OusterPointXYZIRT {
+struct OusterPointXYZIRT
+{
   PCL_ADD_POINT4D;
   float intensity;
   uint32_t t;
@@ -27,16 +29,17 @@ struct OusterPointXYZIRT {
 POINT_CLOUD_REGISTER_POINT_STRUCT(
     OusterPointXYZIRT,
     (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(
-        uint32_t, t, t)(uint16_t, reflectivity, reflectivity)(
-        uint8_t, ring, ring)(uint16_t, noise, noise)(uint32_t, range, range))
+        std::uint32_t, t, t)(std::uint16_t, reflectivity, reflectivity)(
+        std::uint8_t, ring, ring)(std::uint16_t, noise, noise)(std::uint32_t, range, range))
 
 // Use the Velodyne point format as a common representation
 using PointXYZIRT = VelodynePointXYZIRT;
 
 const int queueLength = 2000;
 
-class ImageProjection : public ParamServer {
- private:
+class ImageProjection : public ParamServer
+{
+private:
   std::mutex imuLock;
   std::mutex vinsOdomLock;
   std::mutex imuOdomLock;
@@ -87,8 +90,9 @@ class ImageProjection : public ParamServer {
 
   vector<int> columnIdnCountVec;
 
- public:
-  ImageProjection() : deskewFlag(0) {
+public:
+  ImageProjection() : deskewFlag(0)
+  {
     subImu = nh.subscribe<sensor_msgs::Imu>(imuTopic, 2000,
                                             &ImageProjection::imuHandler, this,
                                             ros::TransportHints().tcpNoDelay());
@@ -115,7 +119,8 @@ class ImageProjection : public ParamServer {
     pcl::console::setVerbosityLevel(pcl::console::L_ERROR);
   }
 
-  void allocateMemory() {
+  void allocateMemory()
+  {
     laserCloudIn.reset(new pcl::PointCloud<PointXYZIRT>());
     tmpOusterCloudIn.reset(new pcl::PointCloud<OusterPointXYZIRT>());
     fullCloud.reset(new pcl::PointCloud<PointType>());
@@ -132,7 +137,8 @@ class ImageProjection : public ParamServer {
     resetParameters();
   }
 
-  void resetParameters() {
+  void resetParameters()
+  {
     laserCloudIn->clear();
     extractedCloud->clear();
     // reset range matrix for range image projection
@@ -142,7 +148,8 @@ class ImageProjection : public ParamServer {
     firstPointFlag = true;
     odomDeskewFlag = false;
 
-    for (int i = 0; i < queueLength; ++i) {
+    for (int i = 0; i < queueLength; ++i)
+    {
       imuTime[i] = 0;
       imuRotX[i] = 0;
       imuRotY[i] = 0;
@@ -154,26 +161,32 @@ class ImageProjection : public ParamServer {
 
   ~ImageProjection() {}
 
-  void imuHandler(const sensor_msgs::Imu::ConstPtr &imuMsg) {
+  void imuHandler(const sensor_msgs::Imu::ConstPtr &imuMsg)
+  {
     sensor_msgs::Imu thisImu = imuConverter(*imuMsg);
     std::lock_guard<std::mutex> lock1(imuLock);
     imuQueue.push_back(thisImu);
   }
 
-  void vinsOdometryHandler(const nav_msgs::Odometry::ConstPtr &odometryMsg) {
+  void vinsOdometryHandler(const nav_msgs::Odometry::ConstPtr &odometryMsg)
+  {
     std::lock_guard<std::mutex> lock2(vinsOdomLock);
     vinsOdomQueue.push_back(*odometryMsg);
   }
 
-  void imuOdometryHandler(const nav_msgs::Odometry::ConstPtr &odometryMsg) {
+  void imuOdometryHandler(const nav_msgs::Odometry::ConstPtr &odometryMsg)
+  {
     std::lock_guard<std::mutex> lock2(imuOdomLock);
     imuOdomQueue.push_back(*odometryMsg);
   }
 
-  void cloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg) {
-    if (!cachePointCloud(laserCloudMsg)) return;
+  void cloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
+  {
+    if (!cachePointCloud(laserCloudMsg))
+      return;
 
-    if (!deskewInfo()) return;
+    if (!deskewInfo())
+      return;
 
     projectPointCloud();
 
@@ -184,22 +197,28 @@ class ImageProjection : public ParamServer {
     resetParameters();
   }
 
-  bool cachePointCloud(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg) {
+  bool cachePointCloud(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
+  {
     // cache point cloud
     cloudQueue.push_back(*laserCloudMsg);
-    if (cloudQueue.size() <= 2) return false;
+    if (cloudQueue.size() <= 2)
+      return false;
 
     // convert cloud
     currentCloudMsg = std::move(cloudQueue.front());
     cloudQueue.pop_front();
-    if (sensor == SensorType::VELODYNE || sensor == SensorType::LIVOX) {
+    if (sensor == SensorType::VELODYNE || sensor == SensorType::LIVOX)
+    {
       pcl::moveFromROSMsg(currentCloudMsg, *laserCloudIn);
-    } else if (sensor == SensorType::OUSTER) {
+    }
+    else if (sensor == SensorType::OUSTER)
+    {
       // Convert to Velodyne format
       pcl::moveFromROSMsg(currentCloudMsg, *tmpOusterCloudIn);
       laserCloudIn->points.resize(tmpOusterCloudIn->size());
       laserCloudIn->is_dense = tmpOusterCloudIn->is_dense;
-      for (size_t i = 0; i < tmpOusterCloudIn->size(); i++) {
+      for (size_t i = 0; i < tmpOusterCloudIn->size(); i++)
+      {
         auto &src = tmpOusterCloudIn->points[i];
         auto &dst = laserCloudIn->points[i];
         dst.x = src.x;
@@ -209,7 +228,9 @@ class ImageProjection : public ParamServer {
         dst.ring = src.ring;
         dst.time = src.t * 1e-9f;
       }
-    } else {
+    }
+    else
+    {
       ROS_ERROR_STREAM("Unknown sensor type: " << int(sensor));
       ros::shutdown();
     }
@@ -220,7 +241,8 @@ class ImageProjection : public ParamServer {
     timeScanEnd = timeScanCur + laserCloudIn->points.back().time;
 
     // check dense flag
-    if (laserCloudIn->is_dense == false) {
+    if (laserCloudIn->is_dense == false)
+    {
       ROS_ERROR(
           "Point cloud is not in dense format, please remove NaN points "
           "first!");
@@ -229,15 +251,19 @@ class ImageProjection : public ParamServer {
 
     // check ring channel
     static int ringFlag = 0;
-    if (ringFlag == 0) {
+    if (ringFlag == 0)
+    {
       ringFlag = -1;
-      for (int i = 0; i < (int)currentCloudMsg.fields.size(); ++i) {
-        if (currentCloudMsg.fields[i].name == "ring") {
+      for (int i = 0; i < (int)currentCloudMsg.fields.size(); ++i)
+      {
+        if (currentCloudMsg.fields[i].name == "ring")
+        {
           ringFlag = 1;
           break;
         }
       }
-      if (ringFlag == -1) {
+      if (ringFlag == -1)
+      {
         ROS_ERROR(
             "Point cloud ring channel not available, please configure your "
             "point cloud data!");
@@ -246,10 +272,13 @@ class ImageProjection : public ParamServer {
     }
 
     // check point time
-    if (deskewFlag == 0) {
+    if (deskewFlag == 0)
+    {
       deskewFlag = -1;
-      for (auto &field : currentCloudMsg.fields) {
-        if (field.name == "time" || field.name == "t") {
+      for (auto &field : currentCloudMsg.fields)
+      {
+        if (field.name == "time" || field.name == "t")
+        {
           deskewFlag = 1;
           break;
         }
@@ -263,13 +292,15 @@ class ImageProjection : public ParamServer {
     return true;
   }
 
-  bool deskewInfo() {
+  bool deskewInfo()
+  {
     std::lock_guard<std::mutex> lock1(imuLock);
 
     // make sure IMU data available for the scan
     if (imuQueue.empty() ||
         imuQueue.front().header.stamp.toSec() > timeScanCur ||
-        imuQueue.back().header.stamp.toSec() < timeScanEnd) {
+        imuQueue.back().header.stamp.toSec() < timeScanEnd)
+    {
       ROS_DEBUG("Waiting for IMU data ...");
       return false;
     }
@@ -291,21 +322,25 @@ class ImageProjection : public ParamServer {
     return true;
   }
 
-  void imuDeskewInfo() {
+  void imuDeskewInfo()
+  {
     cloudInfo.imuAvailable = false;
 
-    while (!imuQueue.empty()) {
+    while (!imuQueue.empty())
+    {
       if (imuQueue.front().header.stamp.toSec() < timeScanCur - 0.01)
         imuQueue.pop_front();
       else
         break;
     }
 
-    if (imuQueue.empty()) return;
+    if (imuQueue.empty())
+      return;
 
     imuPointerCur = 0;
 
-    for (int i = 0; i < (int)imuQueue.size(); ++i) {
+    for (int i = 0; i < (int)imuQueue.size(); ++i)
+    {
       sensor_msgs::Imu thisImuMsg = imuQueue[i];
       double currentImuTime = thisImuMsg.header.stamp.toSec();
 
@@ -314,9 +349,11 @@ class ImageProjection : public ParamServer {
         imuRPY2rosRPY(&thisImuMsg, &cloudInfo.imuRollInit,
                       &cloudInfo.imuPitchInit, &cloudInfo.imuYawInit);
 
-      if (currentImuTime > timeScanEnd + 0.01) break;
+      if (currentImuTime > timeScanEnd + 0.01)
+        break;
 
-      if (imuPointerCur == 0) {
+      if (imuPointerCur == 0)
+      {
         imuRotX[0] = 0;
         imuRotY[0] = 0;
         imuRotZ[0] = 0;
@@ -343,29 +380,35 @@ class ImageProjection : public ParamServer {
 
     --imuPointerCur;
 
-    if (imuPointerCur <= 0) return;
+    if (imuPointerCur <= 0)
+      return;
 
     cloudInfo.imuAvailable = true;
   }
 
-  void vinsOdomDeskewInfo() {
+  void vinsOdomDeskewInfo()
+  {
     cloudInfo.vinsOdomAvailable = false;
 
-    while (!vinsOdomQueue.empty()) {
+    while (!vinsOdomQueue.empty())
+    {
       if (vinsOdomQueue.front().header.stamp.toSec() < timeScanCur - 0.01)
         vinsOdomQueue.pop_front();
       else
         break;
     }
 
-    if (vinsOdomQueue.empty()) return;
+    if (vinsOdomQueue.empty())
+      return;
 
-    if (vinsOdomQueue.front().header.stamp.toSec() > timeScanCur) return;
+    if (vinsOdomQueue.front().header.stamp.toSec() > timeScanCur)
+      return;
 
     // get start odometry at the beinning of the scan
     nav_msgs::Odometry startOdomMsg;
 
-    for (int i = 0; i < (int)vinsOdomQueue.size(); ++i) {
+    for (int i = 0; i < (int)vinsOdomQueue.size(); ++i)
+    {
       startOdomMsg = vinsOdomQueue[i];
 
       if (ROS_TIME(&startOdomMsg) < timeScanCur)
@@ -395,11 +438,13 @@ class ImageProjection : public ParamServer {
     // get end odometry at the end of the scan
     odomDeskewFlag = false;
 
-    if (vinsOdomQueue.back().header.stamp.toSec() < timeScanEnd) return;
+    if (vinsOdomQueue.back().header.stamp.toSec() < timeScanEnd)
+      return;
 
     nav_msgs::Odometry endOdomMsg;
 
-    for (int i = 0; i < (int)vinsOdomQueue.size(); ++i) {
+    for (int i = 0; i < (int)vinsOdomQueue.size(); ++i)
+    {
       endOdomMsg = vinsOdomQueue[i];
 
       if (ROS_TIME(&endOdomMsg) < timeScanEnd)
@@ -433,28 +478,34 @@ class ImageProjection : public ParamServer {
     odomDeskewFlag = true;
   }
 
-  void imuOdomDeskewInfo() {
+  void imuOdomDeskewInfo()
+  {
     cloudInfo.imuOdomAvailable = false;
     nav_msgs::Odometry startOdomMsg;
     tf::Quaternion orientation;
     double roll, pitch, yaw;
 
-    while (!imuOdomQueue.empty()) {
+    while (!imuOdomQueue.empty())
+    {
       if (imuOdomQueue.front().header.stamp.toSec() < timeScanCur - 0.01)
         imuOdomQueue.pop_front();
       else
         break;
     }
 
-    if (imuOdomQueue.empty()) return;
+    if (imuOdomQueue.empty())
+      return;
 
-    if (imuOdomQueue.front().header.stamp.toSec() > timeScanCur) return;
+    if (imuOdomQueue.front().header.stamp.toSec() > timeScanCur)
+      return;
 
     //? add: 如果vins odom不可用，则寻找imu odom
-    if (cloudInfo.vinsOdomAvailable == false) {
+    if (cloudInfo.vinsOdomAvailable == false)
+    {
       // get start odometry at the beinning of the scan
 
-      for (int i = 0; i < (int)imuOdomQueue.size(); ++i) {
+      for (int i = 0; i < (int)imuOdomQueue.size(); ++i)
+      {
         startOdomMsg = imuOdomQueue[i];
 
         if (ROS_TIME(&startOdomMsg) < timeScanCur)
@@ -481,13 +532,16 @@ class ImageProjection : public ParamServer {
 
     //? add: 同理，如果vins odom的增量平移变换不可用，则寻找imu
     // odom的增量平移变换
-    if (odomDeskewFlag == false) {
+    if (odomDeskewFlag == false)
+    {
       // get end odometry at the end of the scan
-      if (imuOdomQueue.back().header.stamp.toSec() < timeScanEnd) return;
+      if (imuOdomQueue.back().header.stamp.toSec() < timeScanEnd)
+        return;
 
       nav_msgs::Odometry endOdomMsg;
 
-      for (int i = 0; i < (int)imuOdomQueue.size(); ++i) {
+      for (int i = 0; i < (int)imuOdomQueue.size(); ++i)
+      {
         endOdomMsg = imuOdomQueue[i];
 
         if (ROS_TIME(&endOdomMsg) < timeScanEnd)
@@ -523,22 +577,28 @@ class ImageProjection : public ParamServer {
   }
 
   void findRotation(double pointTime, float *rotXCur, float *rotYCur,
-                    float *rotZCur) {
+                    float *rotZCur)
+  {
     *rotXCur = 0;
     *rotYCur = 0;
     *rotZCur = 0;
 
     int imuPointerFront = 0;
-    while (imuPointerFront < imuPointerCur) {
-      if (pointTime < imuTime[imuPointerFront]) break;
+    while (imuPointerFront < imuPointerCur)
+    {
+      if (pointTime < imuTime[imuPointerFront])
+        break;
       ++imuPointerFront;
     }
 
-    if (pointTime > imuTime[imuPointerFront] || imuPointerFront == 0) {
+    if (pointTime > imuTime[imuPointerFront] || imuPointerFront == 0)
+    {
       *rotXCur = imuRotX[imuPointerFront];
       *rotYCur = imuRotY[imuPointerFront];
       *rotZCur = imuRotZ[imuPointerFront];
-    } else {
+    }
+    else
+    {
       int imuPointerBack = imuPointerFront - 1;
       double ratioFront = (pointTime - imuTime[imuPointerBack]) /
                           (imuTime[imuPointerFront] - imuTime[imuPointerBack]);
@@ -554,7 +614,8 @@ class ImageProjection : public ParamServer {
   }
 
   void findPosition(double relTime, float *posXCur, float *posYCur,
-                    float *posZCur) {
+                    float *posZCur)
+  {
     *posXCur = 0;
     *posYCur = 0;
     *posZCur = 0;
@@ -564,7 +625,8 @@ class ImageProjection : public ParamServer {
 
     //? add:
     // 打开去平移畸变，因为对于自动驾驶场景来说，高速状态下平移还是比较大的
-    if (transDeskew) {
+    if (transDeskew)
+    {
       if (cloudInfo.vinsOdomAvailable == false ||
           cloudInfo.imuOdomAvailable == false || odomDeskewFlag == false)
         return;
@@ -577,8 +639,10 @@ class ImageProjection : public ParamServer {
     }
   }
 
-  PointType deskewPoint(PointType *point, double relTime) {
-    if (deskewFlag == -1 || cloudInfo.imuAvailable == false) return *point;
+  PointType deskewPoint(PointType *point, double relTime)
+  {
+    if (deskewFlag == -1 || cloudInfo.imuAvailable == false)
+      return *point;
 
     double pointTime = timeScanCur + relTime;
 
@@ -588,7 +652,8 @@ class ImageProjection : public ParamServer {
     float posXCur, posYCur, posZCur;
     findPosition(relTime, &posXCur, &posYCur, &posZCur);
 
-    if (firstPointFlag == true) {
+    if (firstPointFlag == true)
+    {
       transStartInverse = (pcl::getTransformation(posXCur, posYCur, posZCur,
                                                   rotXCur, rotYCur, rotZCur))
                               .inverse();
@@ -612,10 +677,12 @@ class ImageProjection : public ParamServer {
     return newPoint;
   }
 
-  void projectPointCloud() {
+  void projectPointCloud()
+  {
     int cloudSize = laserCloudIn->points.size();
     // range image projection
-    for (int i = 0; i < cloudSize; ++i) {
+    for (int i = 0; i < cloudSize; ++i)
+    {
       PointType thisPoint;
       thisPoint.x = laserCloudIn->points[i].x;
       thisPoint.y = laserCloudIn->points[i].y;
@@ -623,28 +690,37 @@ class ImageProjection : public ParamServer {
       thisPoint.intensity = laserCloudIn->points[i].intensity;
 
       float range = pointDistance(thisPoint);
-      if (range < lidarMinRange || range > lidarMaxRange) continue;
+      if (range < lidarMinRange || range > lidarMaxRange)
+        continue;
 
       int rowIdn = laserCloudIn->points[i].ring;
-      if (rowIdn < 0 || rowIdn >= N_SCAN) continue;
+      if (rowIdn < 0 || rowIdn >= N_SCAN)
+        continue;
 
-      if (rowIdn % downsampleRate != 0) continue;
+      if (rowIdn % downsampleRate != 0)
+        continue;
 
       int columnIdn = -1;
-      if (sensor == SensorType::VELODYNE || sensor == SensorType::OUSTER) {
+      if (sensor == SensorType::VELODYNE || sensor == SensorType::OUSTER)
+      {
         float horizonAngle = atan2(thisPoint.x, thisPoint.y) * 180 / M_PI;
         static float ang_res_x = 360.0 / float(Horizon_SCAN);
         columnIdn =
             -round((horizonAngle - 90.0) / ang_res_x) + Horizon_SCAN / 2;
-        if (columnIdn >= Horizon_SCAN) columnIdn -= Horizon_SCAN;
-      } else if (sensor == SensorType::LIVOX) {
+        if (columnIdn >= Horizon_SCAN)
+          columnIdn -= Horizon_SCAN;
+      }
+      else if (sensor == SensorType::LIVOX)
+      {
         columnIdn = columnIdnCountVec[rowIdn];
         columnIdnCountVec[rowIdn] += 1;
       }
 
-      if (columnIdn < 0 || columnIdn >= Horizon_SCAN) continue;
+      if (columnIdn < 0 || columnIdn >= Horizon_SCAN)
+        continue;
 
-      if (rangeMat.at<float>(rowIdn, columnIdn) != FLT_MAX) continue;
+      if (rangeMat.at<float>(rowIdn, columnIdn) != FLT_MAX)
+        continue;
 
       thisPoint = deskewPoint(&thisPoint, laserCloudIn->points[i].time);
 
@@ -655,14 +731,18 @@ class ImageProjection : public ParamServer {
     }
   }
 
-  void cloudExtraction() {
+  void cloudExtraction()
+  {
     int count = 0;
     // extract segmented cloud for lidar odometry
-    for (int i = 0; i < N_SCAN; ++i) {
+    for (int i = 0; i < N_SCAN; ++i)
+    {
       cloudInfo.startRingIndex[i] = count - 1 + 5;
 
-      for (int j = 0; j < Horizon_SCAN; ++j) {
-        if (rangeMat.at<float>(i, j) != FLT_MAX) {
+      for (int j = 0; j < Horizon_SCAN; ++j)
+      {
+        if (rangeMat.at<float>(i, j) != FLT_MAX)
+        {
           // mark the points' column index for marking occlusion later
           cloudInfo.pointColInd[count] = j;
           // save range info
@@ -677,7 +757,8 @@ class ImageProjection : public ParamServer {
     }
   }
 
-  void publishClouds() {
+  void publishClouds()
+  {
     cloudInfo.header = cloudHeader;
     cloudInfo.cloud_deskewed = publishCloud(pubExtractedCloud, extractedCloud,
                                             cloudHeader.stamp, lidarFrame);
@@ -685,7 +766,8 @@ class ImageProjection : public ParamServer {
   }
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   ros::init(argc, argv, "lvi_sam");
 
   ImageProjection IP;

@@ -36,8 +36,8 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
 )
 # Specify the OpenCV directory and libraries manually
-set(OpenCV_DIR "/usr/local/share/opencv4")
-find_package(OpenCV REQUIRED)
+set(OpenCV_DIR "/usr/lib/x86_64-linux-gnu/cmake/opencv4")  # Force OpenCV 4.2
+find_package(OpenCV 4.2 REQUIRED)
 
 # Continue with the rest of the CMake configurations
 find_package(OpenMP REQUIRED)
@@ -45,6 +45,8 @@ find_package(PCL REQUIRED)
 find_package(Ceres REQUIRED)
 find_package(GTSAM REQUIRED QUIET)
 find_package(Boost REQUIRED COMPONENTS filesystem program_options system timer)
+find_package(LAPACK REQUIRED)
+find_package(BLAS REQUIRED)
 
 
 ######################
@@ -90,6 +92,7 @@ link_directories(
     ${PCL_LIBRARY_DIRS}
     ${OpenCV_LIBRARY_DIRS}
     ${GTSAM_LIBRARY_DIRS}
+    /usr/lib/x86_64-linux-gnu  # Added for Atlas
 )
 
 ######################
@@ -114,15 +117,13 @@ file(GLOB visual_loop_files
     "src/visual_odometry/visual_loop/ThirdParty/DVision/*.cpp"
     "src/visual_odometry/visual_feature/camera_models/*.cc"
 )
-# Visual Feature Tracker
+#  Visual Feature Tracker
 add_executable(${PROJECT_NAME}_visual_feature ${visual_feature_files})
-target_link_libraries(${PROJECT_NAME}_visual_feature ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_visual_feature ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} atlas)
 # Visual Odometry
 add_executable(${PROJECT_NAME}_visual_odometry ${visual_odometry_files})
-target_link_libraries(${PROJECT_NAME}_visual_odometry ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES}) 
-# Visual Lopp
-add_executable(${PROJECT_NAME}_visual_loop ${visual_loop_files})
-target_link_libraries(${PROJECT_NAME}_visual_loop ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES}) 
+target_link_libraries(${PROJECT_NAME}_visual_odometry ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} atlas)
+
 
 ######################
 ### lidar odometry
@@ -130,17 +131,17 @@ target_link_libraries(${PROJECT_NAME}_visual_loop ${catkin_LIBRARIES} ${PCL_LIBR
 
 # IMU Preintegration
 add_executable(${PROJECT_NAME}_imuPreintegration src/lidar_odometry/imuPreintegration.cpp)
-target_link_libraries(${PROJECT_NAME}_imuPreintegration ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} gtsam Boost::timer)
+target_link_libraries(${PROJECT_NAME}_imuPreintegration ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} gtsam Boost::timer ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} atlas)
 # Range Image Projection
 add_executable(${PROJECT_NAME}_imageProjection src/lidar_odometry/imageProjection.cpp)
 add_dependencies(${PROJECT_NAME}_imageProjection ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
-target_link_libraries(${PROJECT_NAME}_imageProjection ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_imageProjection ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} atlas)
 # Feature Association
 add_executable(${PROJECT_NAME}_featureExtraction src/lidar_odometry/featureExtraction.cpp)
 add_dependencies(${PROJECT_NAME}_featureExtraction ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
-target_link_libraries(${PROJECT_NAME}_featureExtraction ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_featureExtraction ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} atlas)
 # Mapping Optimization
 add_executable(${PROJECT_NAME}_mapOptmization src/lidar_odometry/mapOptmization.cpp)
 add_dependencies(${PROJECT_NAME}_mapOptmization ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 target_compile_options(${PROJECT_NAME}_mapOptmization PRIVATE ${OpenMP_CXX_FLAGS})
-target_link_libraries(${PROJECT_NAME}_mapOptmization PRIVATE ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${OpenMP_CXX_FLAGS} gtsam Boost::timer)
+target_link_libraries(${PROJECT_NAME}_mapOptmization PRIVATE ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${OpenMP_CXX_FLAGS} gtsam Boost::timer ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} atlas)
