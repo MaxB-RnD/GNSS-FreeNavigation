@@ -86,25 +86,22 @@ If you encounter issues with missing libraries or include path errors, update yo
    roslaunch lvi_sam run.launch
    ```   
    This will start processing the data from the bag file and you can monitor the output in RViz or the terminal.
-   </br></br>
-
+   <br/>
+   
    ### Play the Bag File
    Now, in a new terminal navigate to the root of the repository. Now you can play the bag file you previously downloaded. For example, to use the `handheld.bag` file, you can play it using the following command:
    ```bash
    rosbag play handheld.bag
    ```
    This will simulate the sensor data (e.g., IMU, camera, etc.) that LVI-SAM will process.
-   </br>
+</br></br>
 
+
+## Avaliable Datasets  
 (TODO: Provide details on how to run the model tests, input data format, and expected outputs)  
-
-
-
+</br></br>
 
 
 ## References  
 - [LVi-SAM](https://github.com/TixiaoShan/LVI-SAM)  
-(TODO: Add relevant papers or projects)  
-
-## License  
-(Add license details, if applicable)
+(TODO: Add relevant papers or projects) 
