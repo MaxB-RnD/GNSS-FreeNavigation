@@ -56,7 +56,6 @@ Follow these steps to install GTSAM:
    ```
    </br>
 
-
 ### 4. Library Troubleshooting  
 If you encounter issues with missing libraries or include path errors, update your `c_cpp_properties.json` file to include the **ROS**, **Eigen**, and **OpenCV** libraries.  
 
@@ -91,7 +90,7 @@ If you encounter issues with missing libraries or include path errors, update yo
    ### Play the Bag File
    Now, in a new terminal navigate to the root of the repository. Now you can play the bag file you previously downloaded. For example, to use the `handheld.bag` file, you can play it using the following command:
    ```bash
-   rosbag play handheld.bag
+   rosbag play bags/handheld.bag
    ```
    This will simulate the sensor data (e.g., IMU, camera, etc.) that LVI-SAM will process.
 </br></br>
