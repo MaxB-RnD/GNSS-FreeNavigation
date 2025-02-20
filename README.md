@@ -73,6 +73,7 @@ If you encounter issues with missing libraries or include path errors, update yo
    catkin_make
    source devel/setup.bash
    ```
+   </br>
 
    ### Download the Bag File
    If you are not using real hardware, you can simulate sensor data using a pre-recorded ROS bag file. Go to the Goolge Drive and download some bag files for testing.
@@ -81,7 +82,6 @@ If you encounter issues with missing libraries or include path errors, update yo
    ```
    </br>
 
-   
    ### Launch LVI-SAM
    Once you have the bag file, you can launch the LVI-SAM node to prepare it to start processing the data. Depending on whether you're using the modified version or the official version of LVI-SAM, use the appropriate launch file:
    ```bash
@@ -90,7 +90,6 @@ If you encounter issues with missing libraries or include path errors, update yo
    This will start processing the data from the bag file and you can monitor the output in RViz or the terminal.
    </br>
 
-
    ### Play the Bag File
    Now, in a new terminal navigate to the root of the repository. Now you can play the bag file you previously downloaded. For example, to use the `handheld.bag` file, you can play it using the following command:
    ```bash
@@ -98,6 +97,7 @@ If you encounter issues with missing libraries or include path errors, update yo
    ```
    This will simulate the sensor data (e.g., IMU, camera, etc.) that LVI-SAM will process.
    </br>
+   
 (TODO: Provide details on how to run the model tests, input data format, and expected outputs)  
 
 
