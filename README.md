@@ -9,7 +9,6 @@ GNSS-FreeNav is a deep learning-based navigation system designed for **GNSS-deni
 - **Robust to GNSS Outages** – Provides navigation solutions when GPS signals are unavailable.  
 - **Optimised for Embedded Systems** – Designed for deployment on platforms like the Jetson Nano.  
 - **Incorporates Open-Source Models** – Builds upon existing research, including LVI-SAM.  
-</br>
 
 
 ## Branch Guide
