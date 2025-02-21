@@ -103,4 +103,6 @@ If you encounter issues with missing libraries or include path errors, update yo
 
 ## References  
 - [LVi-SAM](https://github.com/TixiaoShan/LVI-SAM)  
-(TODO: Add relevant papers or projects) 
+- [LVi-SAM (New)](https://github.com/Cc19245/LVI-SAM-Easyused/tree/new)  
+- [LIO-SAM](https://github.com/TixiaoShan/LIO-SAM)
+- [VINS-MONO](https://github.com/HKUST-Aerial-Robotics/VINS-Mono)
