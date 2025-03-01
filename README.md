@@ -11,9 +11,9 @@ To get the program up and running, you will need to install the following depend
    ```bash
    sudo apt-get install -y libgoogle-glog-dev
    sudo apt-get install -y libatlas-base-dev
-   wget -O ~/Downloads/ceres.zip https://github.com/ceres-solver/ceres-solver/archive/1.14.0.zip
-   cd ~/Downloads/ && unzip ceres.zip -d ~/Downloads/
-   cd ~/Downloads/ceres-solver-1.14.0
+   wget -O ~/Projects/GNSS-FreeNav/ceres.zip https://github.com/ceres-solver/ceres-solver/archive/1.14.0.zip
+   cd ~/Projects/GNSS-FreeNav/ && unzip ceres.zip -d ~/Projects/GNSS-FreeNav/
+   cd ~/Projects/GNSS-FreeNav/ceres-solver-1.14.0
    mkdir ceres-bin && cd ceres-bin
    cmake ..
    sudo make install -j4 
@@ -40,7 +40,7 @@ Follow these steps to install GTSAM:
    #### 3. Install GTSAM
    Clone the GTSAM repository and build it:
    ```bash
-   cd ~/Documents/GNSS-FreeNav  # Adjust path if needed
+   cd ~/Projects/GNSS-FreeNav # Adjust path if needed
    git clone --branch 4.2a1 https://github.com/borglab/gtsam.git gtsam
    cd gtsam
    mkdir build && cd build
@@ -52,7 +52,7 @@ Follow these steps to install GTSAM:
    #### 4. Verify the installation
    After confirming that GTSAM is working, you can remove the temporary folder:
    ```bash
-   rm -rf ~/Documents/GNSS-FreeNav/gtsam
+   rm -rf ~/Projects/GNSS-FreeNav/gtsam
    ```
    </br>
    
@@ -70,7 +70,7 @@ If you encounter issues with missing libraries or include path errors, update yo
    source /opt/ros/noetic/setup.bash
    source ~/"Path to Repository"/devel/setup.bash
    catkin_make clean
-   catkin_make
+   catkin_make -j4
    source devel/setup.bash
    ```
    
