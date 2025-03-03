@@ -1,0 +1,21 @@
+digraph G {
+"map" -> "odom"[label="Broadcaster: /lvi_sam_imuPreintegration\nAverage rate: 501.008 Hz\nMost recent transform: 1594315733.393 ( 146594659.314 sec old)\nBuffer length: 4.934 sec\n"];
+"vins_world" -> "vins_body_imuhz"[label="Broadcaster: /lvi_sam_visual_odometry\nAverage rate: 501.008 Hz\nMost recent transform: 1594315733.393 ( 146594659.314 sec old)\nBuffer length: 4.934 sec\n"];
+"odom" -> "vins_world"[label="Broadcaster: /lvi_sam_visual_odometry\nAverage rate: 501.008 Hz\nMost recent transform: 1594315733.393 ( 146594659.314 sec old)\nBuffer length: 4.934 sec\n"];
+"vins_body_imuhz" -> "vins_cameraFLU"[label="Broadcaster: /lvi_sam_visual_odometry\nAverage rate: 501.008 Hz\nMost recent transform: 1594315733.393 ( 146594659.314 sec old)\nBuffer length: 4.934 sec\n"];
+"odom" -> "base_link"[label="Broadcaster: /lvi_sam_imuPreintegration\nAverage rate: 501.008 Hz\nMost recent transform: 1594315733.393 ( 146594659.314 sec old)\nBuffer length: 4.934 sec\n"];
+"chassis_link" -> "loam_camera"[label="Broadcaster: /lvi_sam_robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1740910392.707 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "chassis_link"[label="Broadcaster: /lvi_sam_robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1740910392.707 sec old)\nBuffer length: 0.000 sec\n"];
+"imu_link" -> "imu_enu_link"[label="Broadcaster: /lvi_sam_robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1740910392.707 sec old)\nBuffer length: 0.000 sec\n"];
+"chassis_link" -> "imu_link"[label="Broadcaster: /lvi_sam_robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1740910392.707 sec old)\nBuffer length: 0.000 sec\n"];
+"chassis_link" -> "navsat_link"[label="Broadcaster: /lvi_sam_robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1740910392.707 sec old)\nBuffer length: 0.000 sec\n"];
+"chassis_link" -> "realsense_link"[label="Broadcaster: /lvi_sam_robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1740910392.707 sec old)\nBuffer length: 0.000 sec\n"];
+"chassis_link" -> "velodyne"[label="Broadcaster: /lvi_sam_robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1740910392.707 sec old)\nBuffer length: 0.000 sec\n"];
+"vins_world" -> "vins_body"[label="Broadcaster: /lvi_sam_visual_odometry\nAverage rate: 20.273 Hz\nMost recent transform: 1594315733.262 ( 146594659.445 sec old)\nBuffer length: 4.834 sec\n"];
+"vins_body" -> "vins_camera"[label="Broadcaster: /lvi_sam_visual_odometry\nAverage rate: 20.273 Hz\nMost recent transform: 1594315733.262 ( 146594659.445 sec old)\nBuffer length: 4.834 sec\n"];
+"odom" -> "lidar_link"[label="Broadcaster: /lvi_sam_mapOptmization\nAverage rate: 5.173 Hz\nMost recent transform: 1594315732.834 ( 146594659.873 sec old)\nBuffer length: 4.640 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1740910392.707"[ shape=plaintext ] ;
+ }->"map";
+}

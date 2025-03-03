@@ -13,4 +13,8 @@
     <include file="$(find lvi_sam)/launch/include/module_rviz.launch" />
     <!--- SAM -->
     <include file="$(find lvi_sam)/launch/include/module_sam.launch" />
+
+    <!-- Add the node to launch the GPS processing script -->
+    <node pkg="lvi_sam" type="gps_to_point.py" name="gps_to_point_node" output="screen" />
+
 </launch>
